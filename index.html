@@ -1,12 +1,218 @@
-<html>
+<!DOCTYPE html>
+<html lang="es">
 
 <head>
-    <title>pagina de Jorge</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Contactos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Estilos del formulario */
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .btn-add:hover {
+            background-color: #218838;
+        }
+
+        /* Estilos de la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: black;
+            margin-right: 5px;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>pagina de prueba</h1>
-    <p>este es un parrafo</p>
+
+    <div class="container">
+        <h2>Directorio de Contactos</h2>
+
+        <!-- Formulario para ingresar datos -->
+        <form id="contactForm">
+            <input type="hidden" id="editIndex"> <!-- Campo oculto para saber si estamos editando -->
+            <div class="form-group">
+                <input type="text" id="nombre" placeholder="Nombre completo" required>
+                <input type="tel" id="telefono" placeholder="Teléfono" required>
+                <input type="text" id="direccion" placeholder="Dirección" required>
+                <input type="email" id="correo" placeholder="Correo electrónico" required>
+            </div>
+            <button type="submit" id="btnSubmit" class="btn-add">Agregar Contacto</button>
+        </form>
+
+        <!-- Tabla para mostrar datos -->
+        <table id="contactTable">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Correo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los registros aparecerán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const contactForm = document.getElementById('contactForm');
+        const contactTable = document.getElementById('contactTable').getElementsByTagName('tbody')[0];
+        const btnSubmit = document.getElementById('btnSubmit');
+        const editIndexField = document.getElementById('editIndex');
+
+        let contacts = [];
+
+        // Función para renderizar la tabla
+        function renderTable() {
+            contactTable.innerHTML = "";
+            contacts.forEach((contact, index) => {
+                let row = contactTable.insertRow();
+                row.innerHTML = `
+                <td>${contact.nombre}</td>
+                <td>${contact.telefono}</td>
+                <td>${contact.direccion}</td>
+                <td>${contact.correo}</td>
+                <td>
+                    <button class="btn-edit" onclick="editContact(${index})">Editar</button>
+                    <button class="btn-delete" onclick="deleteContact(${index})">Eliminar</button>
+                </td>
+            `;
+            });
+        }
+
+        // Evento para agregar o actualizar
+        contactForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const contactData = {
+                nombre: document.getElementById('nombre').value,
+                telefono: document.getElementById('telefono').value,
+                direccion: document.getElementById('direccion').value,
+                correo: document.getElementById('correo').value
+            };
+
+            const editIndex = editIndexField.value;
+
+            if (editIndex === "") {
+                // Agregar nuevo
+                contacts.push(contactData);
+            } else {
+                // Actualizar existente
+                contacts[editIndex] = contactData;
+                editIndexField.value = "";
+                btnSubmit.textContent = "Agregar Contacto";
+                btnSubmit.style.backgroundColor = "#28a745";
+            }
+
+            contactForm.reset();
+            renderTable();
+        });
+
+        // Función para eliminar
+        function deleteContact(index) {
+            if (confirm("¿Estás seguro de eliminar este contacto?")) {
+                contacts.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        // Función para cargar datos en el formulario y editar
+        function editContact(index) {
+            const contact = contacts[index];
+            document.getElementById('nombre').value = contact.nombre;
+            document.getElementById('telefono').value = contact.telefono;
+            document.getElementById('direccion').value = contact.direccion;
+            document.getElementById('correo').value = contact.correo;
+
+            editIndexField.value = index;
+            btnSubmit.textContent = "Guardar Cambios";
+            btnSubmit.style.backgroundColor = "#007bff";
+        }
+    </script>
+
 </body>
 
 </html>
